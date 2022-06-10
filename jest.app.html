@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Test Rendering</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html {
+        height: 100%;
+        display: flex;
+      }
+
+      body {
+        flex: 1;
+        position: relative;
+        padding-bottom: 100%;
+      }
+
+      .container {
+        position: absolute;
+        background-color: #f9f9fb;
+        margin: 1px;
+        width: 600px;
+        height: 600px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        resize: both;
+        overflow: hidden;
+      }
+
+      iframe {
+        flex: 1;
+        border: 0;
+        align-self: stretch;
+        min-height: 0;
+        min-width: 0;
+      }
+    </style>
+    <script src="jest.app.js" type="module"></script>    
+  </head>
+  <body>
+  </body>
+</html>
