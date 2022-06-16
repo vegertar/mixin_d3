@@ -1,18 +1,48 @@
 {
+  "name": "mixin_d3",
+  "version": "0.1.0",
+  "description": "Mixin D3 with JSON-style Web Components coding",
+  "homepage": "https://github.com/vegertar/mixin_d3",
+  "license": "MIT",
+  "author": {
+    "name": "vegertar",
+    "email": "vegertar@gmail.com",
+    "url": "https://github.com/vegertar"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:vegertar/mixin_d3.git"
+  },
+  "keywords": [
+    "d3",
+    "mixin",
+    "json-style",
+    "data-driven",
+    "web-components"
+  ],
+  "files": [
+    "lib/**/*.js"
+  ],
+  "module": "index.js",
+  "main": "index.js",
+  "types": "index.d.ts",
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "tw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+    "tw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "doc": "typedoc"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.0",
     "axios": "^0.26.1",
+    "d3": "^7.4.4",
     "express": "^4.17.3",
     "jest": "^27.5.1",
+    "muuri": "^0.9.5",
     "tweakpane": "^3.0.8",
-    "ws": "^8.5.0",
-    "muuri": "^0.9.5"
-  },
-  "dependencies": {
-    "d3": "^7.4.4"
+    "typedoc": "^0.22.17",
+    "typedoc-plugin-missing-exports": "^0.22.6",
+    "typescript": "^4.7.3",
+    "ws": "^8.5.0"
   }
 }

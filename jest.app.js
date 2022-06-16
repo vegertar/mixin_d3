@@ -126,6 +126,8 @@ connect();
 
 window.addEventListener("message", (event) => {
   if (event.data.magic === magic) {
-    ws.send(JSON.stringify(event.data));
+    ws.send(
+      JSON.stringify({ ...event.data, userAgent: window.navigator.userAgent })
+    );
   }
 });

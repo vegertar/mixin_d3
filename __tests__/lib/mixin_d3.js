@@ -15,7 +15,7 @@ test("replay changelog in mixin d3", async () => {
         return new Promise((resolve) => {
           const onUpdate = () => {
             foo.removeEventListener("update", onUpdate);
-            foo.complete.then(() => resolve(callback()));
+            foo.complete.then(async () => resolve(await callback()));
           };
           foo.addEventListener("update", onUpdate);
           process();
@@ -188,7 +188,7 @@ test("replay changelog in mixin d3", async () => {
   expect(
     await useScript(
       () =>
-        new Promise((resolve) => {
+        new Promise(async (resolve) => {
           let constructed = 0;
           let connected = 0;
 
@@ -206,15 +206,6 @@ test("replay changelog in mixin d3", async () => {
             }
           );
 
-          const onUpdate = () => {
-            resolve([
-              foo.shadowRoot.querySelector("span").textContent,
-              constructed,
-              connected,
-            ]);
-          };
-
-          foo.addEventListener("update", onUpdate);
           foo.data[1] = {
             tag: "my-component",
             attrs: [["class", "component"]],
@@ -230,9 +221,92 @@ test("replay changelog in mixin d3", async () => {
             attrs: [["class", "component"]],
           };
           foo.data[1].text("44");
+
+          await foo.complete;
+          resolve([
+            foo.shadowRoot.querySelector("span").textContent,
+            constructed,
+            connected,
+          ]);
         })
     )
   ).toEqual(["44", 2, 0]);
+
+  // with custom key
+  expect(
+    await useScript(
+      () =>
+        new Promise(async (resolve) => {
+          let constructed = 0;
+          let connected = 0;
+
+          window.customElements.define(
+            "my-component2",
+            class extends HTMLElement {
+              constructor() {
+                super();
+                ++constructed;
+              }
+
+              connectedCallback() {
+                ++connected;
+              }
+            }
+          );
+
+          foo.data[1] = {
+            tag: "div",
+            key: (d) => d.text,
+            selector: ":scope>*",
+            attrs: [["class", "component"]],
+            children: [
+              {
+                tag: "div",
+                text: "1",
+              },
+              {
+                tag: "my-component2",
+                text: "2",
+              },
+            ],
+          };
+
+          await foo.complete;
+          const first = foo.shadowRoot.querySelector(
+            ".component:nth-child(2)"
+          ).innerHTML;
+
+          foo.data[1].children = [
+            {
+              tag: "my-component2",
+              text: "1",
+            },
+            {
+              tag: "div",
+              text: "2",
+            },
+          ];
+          foo.data[1].children[0] = {
+            tag: "p",
+            text: "1",
+          };
+          foo.data[1].children[0] = {
+            tag: "my-component2",
+            text: "1",
+          };
+          foo.data[1].children[1] = {
+            tag: "p",
+            text: "2",
+          };
+
+          await foo.complete;
+          const second = foo.shadowRoot.querySelector(
+            ".component:nth-child(2)"
+          ).innerHTML;
+          resolve([constructed, connected, first === second]);
+        })
+    )
+  ).toEqual([1, 1, true]);
 
   // add a transition
   expect(
@@ -543,8 +617,212 @@ test("replay changelog in mixin d3", async () => {
             texts.push(this.childNodes[0].textContent);
           };
         },
-        () => texts.join("")
+        async () => {
+          const v = texts.join("");
+          foo.data[3].__call__ = null;
+          foo.data[3].__each__ = null;
+          await foo.complete;
+          return v;
+        }
       );
     })
   ).toEqual("1");
+
+  // join
+  expect(
+    await useScript(async () => {
+      const { create } = await import("/lib/mixin_d3.js");
+
+      let enters = 0;
+      let __enters__ = 0;
+      let updates = 0;
+      let __updates__ = 0;
+      let exits = 0;
+
+      return new Promise(async (resolve) => {
+        const n = foo.data.push({
+          tag: "ol",
+          attrs: { class: "component" },
+          selector: ":scope>*",
+          children: [...Array(4)].map((_i) => ({
+            tag: "li",
+            __enter__: (_s) => {
+              ++__enters__;
+            },
+            __update__: (_s) => {
+              ++__updates__;
+            },
+          })),
+          join: [
+            (enter) => {
+              return enter.append((d, i) => {
+                ++enters;
+                return create(d).text(i).node();
+              });
+            },
+            (update) => update.each(() => ++updates),
+            (exit) => exit.each(() => ++exits).remove(),
+          ],
+        });
+        await foo.complete;
+        const results = [[enters, __enters__, updates, __updates__, exits]];
+
+        foo.data[n - 1].updateChildren();
+        await foo.complete;
+        results.push([enters, __enters__, updates, __updates__, exits]);
+
+        foo.data[n - 1].children[0].text = "x";
+        await foo.complete;
+        results.push([enters, __enters__, updates, __updates__, exits]);
+
+        foo.data[n - 1].children.length = 0;
+        await foo.complete;
+        results.push([enters, __enters__, updates, __updates__, exits]);
+
+        resolve(results);
+      });
+    })
+  ).toEqual([
+    [4, 4, 0, 0, 0],
+    [4, 4, 4, 0, 0],
+    [4, 4, 8, 1, 0],
+    [4, 4, 8, 1, 4],
+  ]);
+});
+
+test("selection-join random letters", async () => {
+  await useHtml();
+  await useScript(async () => {
+    const { ResponsiveSvg } = await import("/lib/responsive-svg.js");
+    const { mixinD3 } = await import("/lib/mixin_d3.js");
+
+    window.customElements.define(
+      "random-letters",
+      class extends mixinD3(ResponsiveSvg) {
+        t;
+
+        constructor() {
+          super();
+
+          this.root = this.root.select("svg");
+          this.ns = "svg";
+          this.key = (d) => d;
+          this.selector = "text";
+          this.join = [
+            (enter) =>
+              enter
+                .append("text")
+                .attr("fill", "green")
+                .attr("x", (_d, i) => i * 16)
+                .attr("y", -30)
+                .text((d) => d)
+                .call((enter) => enter.transition(this.t).attr("y", 0)),
+            (update) =>
+              update
+                .attr("fill", "black")
+                .attr("y", 0)
+                .call((update) =>
+                  update.transition(this.t).attr("x", (_d, i) => i * 16)
+                ),
+            (exit) =>
+              exit
+                .attr("fill", "brown")
+                .call((exit) => exit.transition(this.t).attr("y", 30).remove()),
+          ];
+        }
+      }
+    );
+
+    document.body.innerHTML =
+      '<random-letters viewBox="0,-20,666,33"></random-letters>';
+    const rl = document.querySelector("random-letters");
+    setTimeout(async () => {
+      while (true) {
+        rl.t = rl.root.transition().duration(750);
+        rl.data = d3
+          .shuffle("abcdefghijklmnopqrstuvwxyz".split(""))
+          .slice(0, Math.floor(6 + Math.random() * 20))
+          .sort();
+        await rl.complete;
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+    }, 0);
+  });
+});
+
+test("inner selection-join random letters", async () => {
+  await useHtml();
+  await useScript(async () => {
+    await import("/lib/responsive-svg.js");
+    const { MixinD3 } = await import("/lib/mixin_d3.js");
+
+    window.customElements.define(
+      "random-letters",
+      class extends MixinD3 {
+        t;
+
+        connectedCallback() {
+          this.data = [
+            {
+              tag: "responsive-svg",
+              attrs: [
+                ["class", "component"],
+                ["viewBox", `0,0,666,33`],
+              ],
+              ns: "svg",
+              selector: ":scope>*",
+              children: [
+                {
+                  tag: "svg",
+                  attrs: [["viewBox", `0,-20,666,33`]],
+                  key: (d) => d,
+                  join: [
+                    (enter) =>
+                      enter
+                        .append("text")
+                        .attr("fill", "green")
+                        .attr("x", (_d, i) => i * 16)
+                        .attr("y", -30)
+                        .text((d) => d)
+                        .call((enter) => enter.transition(this.t).attr("y", 0)),
+                    (update) =>
+                      update
+                        .attr("fill", "black")
+                        .attr("y", 0)
+                        .call((update) =>
+                          update.transition(this.t).attr("x", (_d, i) => i * 16)
+                        ),
+                    (exit) =>
+                      exit
+                        .attr("fill", "brown")
+                        .call((exit) =>
+                          exit.transition(this.t).attr("y", 30).remove()
+                        ),
+                  ],
+                },
+              ],
+            },
+          ];
+        }
+
+        async refresh() {
+          this.t = this.root.transition().duration(750);
+          this.data[0].children[0].children = d3
+            .shuffle("abcdefghijklmnopqrstuvwxyz".split(""))
+            .slice(0, Math.floor(6 + Math.random() * 20))
+            .sort();
+          await this.complete;
+        }
+      }
+    );
+
+    document.body.innerHTML = "<random-letters></random-letters>";
+    const rl = document.querySelector("random-letters");
+    setTimeout(async () => {
+      while (true) {
+        await rl.refresh();
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+    }, 0);
+  });
 });

@@ -63,11 +63,10 @@ class Server {
     app.use(express.text());
 
     app.get("/", (_req, res) => {
-      res.set("Content-Type", "text/html");
-      res.sendFile(path.join(process.cwd(), "jest.app.html"));
+      res.redirect(301, "/jest.app.html");
     });
 
-    app.get("/*.(js|css)", (req, res) => {
+    app.get("/*.(js|css|html)", (req, res) => {
       res.sendFile(path.join(process.cwd(), req.path));
     });
 
@@ -165,13 +164,14 @@ class Server {
       client.on("message", (message) => {
         const { id, ...data } = JSON.parse(message.toString());
 
+        const key = this._key(id, client);
+        if (data.error) {
+          console.error(key, data);
+        }
+
         if (client === this.masterClient) {
           this.applyCallback(id, data);
         } else {
-          const key = this._key(id, client);
-          if (data.error) {
-            console.error(key, data);
-          }
           this.slavesResolves.get(key)?.();
         }
       });

@@ -1,10 +1,10 @@
-test("bar chart for number of textbooks for school phases", async () => {
+test("A very simple bar-chart", async () => {
   const phases = {
-    小学: 171,
-    初中: 101,
-    "小学（五•四学制）": 20,
-    "初中（五•四学制）": 22,
-    高中: 125,
+    A: 171,
+    B: 101,
+    C: 20,
+    D: 22,
+    E: 125,
   };
 
   await useHtml();
@@ -44,6 +44,7 @@ test("bar chart for number of textbooks for school phases", async () => {
       children: [
         {
           tag: "svg",
+          attrs: [["viewBox", `0,0,${width},${height}`]],
           children: [
             {
               tag: "g",
@@ -64,7 +65,7 @@ test("bar chart for number of textbooks for school phases", async () => {
                   width: xScale.bandwidth(),
                   height: yScale(0) - yScale(d[1]),
                 },
-                children: [{ tag: "title", text: `${d[1]}册` }],
+                children: [{ tag: "title", text: d[1] }],
               })),
             },
             {

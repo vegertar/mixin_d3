@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Mixin D3 Example: Repeat Circle</title>
+    <meta charset="UTF-8" />
+    <style>
+      html {
+        height: 100%;
+        display: flex;
+      }
+
+      body {
+        flex: 1;
+      }
+    </style>
+    <script src="/node_modules/d3/dist/d3.js" type="module"></script>
+    <script type="module">
+      import { ResponsiveSvg } from "/lib/responsive-svg.js";
+      import { mixinD3 } from "/lib/mixin_d3.js";
+
+      window.customElements.define(
+        "my-app",
+        class extends mixinD3(ResponsiveSvg) {
+          ns = "svg";
+          root = this.root.select("svg");
+        }
+      );
+    </script>
+  </head>
+  <body>
+    <my-app viewBox="0 0 960 500"></my-app>
+    <script type="module">
+      const myApp = document.querySelector("my-app");
+      myApp.data = [
+        {
+          tag: "circle",
+          attrs: {
+            class: "component",
+            fill: "steelblue",
+            r: 20,
+            cx: 40,
+            cy: 250,
+          },
+          transitions: [
+            {
+              duration: 2000,
+              attrs: { cx: 920 },
+            },
+            {
+              duration: 2000,
+              attrs: { cx: 40 },
+              events: {
+                end() {
+                  // repeat the circle
+                  myApp.data[0].transitions = myApp.data[0].transitions;
+                },
+              },
+            },
+          ],
+        },
+      ];
+    </script>
+  </body>
+</html>
