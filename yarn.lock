@@ -3303,6 +3303,11 @@ typedoc-plugin-missing-exports@^0.22.6:
   resolved "https://mirrors.huaweicloud.com/repository/npm/typedoc-plugin-missing-exports/-/typedoc-plugin-missing-exports-0.22.6.tgz#7467c60f1cd26507124103f0b9bca271d5aa8d71"
   integrity sha512-1uguGQqa+c5f33nWS3v1mm0uAx4Ii1lw4Kx2zQksmYFKNEWTmrmMXbMNBoBg4wu0p4dFCNC7JIWPoRzpNS6pFA==
 
+typedoc-plugin-replace-text@^1.0.0:
+  version "1.0.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/typedoc-plugin-replace-text/-/typedoc-plugin-replace-text-1.0.0.tgz#c9bb89d75ebf152c784429afc4dc078e1abf27ec"
+  integrity sha512-SyisHUYA0e6jOeU4S0WLwibDZg79+9exZ7hOReybUQ19/ZRvqmUovgovipf0bBNIh/l7161mtNPa66JrIZg8tQ==
+
 typedoc@^0.22.17:
   version "0.22.17"
   resolved "https://mirrors.huaweicloud.com/repository/npm/typedoc/-/typedoc-0.22.17.tgz#bc51cc95f569040112504300831cdac4f8089b7b"

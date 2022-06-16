@@ -17,6 +17,8 @@
     "web-components"
   ],
   "files": [
+    "index.js",
+    "index.d.ts",
     "lib/**/*.js",
     "lib/**/*.ts"
   ],
@@ -39,6 +41,7 @@
     "tweakpane": "^3.0.8",
     "typedoc": "^0.22.17",
     "typedoc-plugin-missing-exports": "^0.22.6",
+    "typedoc-plugin-replace-text": "^1.0.0",
     "typescript": "^4.7.3",
     "ws": "^8.5.0"
   },

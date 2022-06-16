@@ -3,5 +3,20 @@
   "entryPoints": ["index.d.ts"],
   "excludeExternals": true,
   "media": "media",
-  "out": "docs"
+  "out": "docs",
+  "replaceText": {
+    "inCodeCommentText": false,
+    "inCodeCommentTags": false,
+    "inIncludedFiles": true,
+    "replacements": [
+      {
+        "pattern": "/lib/mixin_d3.js",
+        "replace": "https://github.com/vegertar/mixin_d3/blob/main/lib/mixin_d3.js"
+      },
+      {
+        "pattern": "/__tests__/lib/",
+        "replace": "https://github.com/vegertar/mixin_d3/blob/main/__tests__/lib/"
+      }
+    ]
+  }
 }

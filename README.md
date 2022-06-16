@@ -4,16 +4,7 @@ Although the component-based frameworks, e.g. vue, react, angular, are used ever
 
 Modern browser comes with a suite of different technologies called [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components), the heavily used development way in our vanilla js projects, with loads of dependent of D3, I write the [mixin_d3.js](/lib/mixin_d3.js), to approach a little bit of more friendly data-driven programming, which just works as below. [_Edit in here_](https://stackblitz.com/edit/js-c6aqfb?file=index.js), or if you [_prefer typescript_](https://codesandbox.io/s/long-violet-7d9ehm?file=/src/index.ts).
 
-<div style="position: relative">
-  <style type="text/css">
-    #repeat-circle {
-      position: absolute;
-      right: 20px;
-      top: 20%;
-    }
-  </style>
-
-  <img src="media/repeat-circle.gif" alt="repeat circle" width="320" height="166" id="repeat-circle">
+![repeat circle](media/repeat-circle.gif "repeat circle")
 
 ```js
 document.body.innerHTML = '<my-app viewBox="0,0,960,500"></my-app>';
@@ -47,8 +38,6 @@ myApp.data = [
   },
 ];
 ```
-
-</div>
 
 The corresponding D3 example is [here](https://bl.ocks.org/d3noob/bf44061b1d443f455b3f857f82721372):
 
