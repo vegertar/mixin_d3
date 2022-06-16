@@ -1,3 +1,7 @@
+[![NPM](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/mixin_d3)
+[![GH](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=GitHub%20Pages&logoColor=white)](https://vegertar.github.io/mixin_d3/)
+
+
 # Mixin D3
 
 Although the component-based frameworks, e.g. vue, react, angular, are used everywhere, [D3js](https://d3js.org/) is still the industry standard for data visualization. Lots seem not to be big fans of how D3 handles updating DOM, especially at the moment that [You-Don't-Need-jQuery](https://github.com/nefe/You-Dont-Need-jQuery). Then some things become interesting and annoying, libraries go back and forth between abstraction and flexibility, from the most talented DSL to low-level vanilla js, many awesome projects appear every year, as well as the totally awesome browser.
