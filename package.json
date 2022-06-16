@@ -4,14 +4,10 @@
   "description": "Mixin D3 with JSON-style Web Components coding",
   "homepage": "https://github.com/vegertar/mixin_d3",
   "license": "MIT",
-  "author": {
-    "name": "vegertar",
-    "email": "vegertar@gmail.com",
-    "url": "https://github.com/vegertar"
-  },
+  "author": "vegertar <vegertar@gmail.com> (https://github.com/vegertar)",
   "repository": {
     "type": "git",
-    "url": "git@github.com:vegertar/mixin_d3.git"
+    "url": "git+ssh://git@github.com/vegertar/mixin_d3.git"
   },
   "keywords": [
     "d3",
@@ -21,7 +17,8 @@
     "web-components"
   ],
   "files": [
-    "lib/**/*.js"
+    "lib/**/*.js",
+    "lib/**/*.ts"
   ],
   "module": "index.js",
   "main": "index.js",
@@ -44,5 +41,13 @@
     "typedoc-plugin-missing-exports": "^0.22.6",
     "typescript": "^4.7.3",
     "ws": "^8.5.0"
+  },
+  "bugs": {
+    "url": "https://github.com/vegertar/mixin_d3/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "example",
+    "lib": "lib"
   }
 }

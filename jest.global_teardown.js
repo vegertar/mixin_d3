@@ -1,3 +1,5 @@
 export default function () {
-  // NOP
+  if (process.argv.indexOf("--watch") === -1) {
+    global.server_process?.kill();
+  }
 }
