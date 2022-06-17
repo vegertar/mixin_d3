@@ -100,8 +100,8 @@ export interface Datum {
    * datum. To remove all children one should assign `children` an empty array,
    * or just set `children.length` to zero, `undefined` or `null` one will not
    * be touched. Pay attention that `children` behaves completely different from
-   * `d3.Selection.data` when type is `Datum[]` with an empty `key`. In this
-   * case, whenever a `children` item is assigned a new `Datum` object, the
+   * `d3.Selection.data` when type is `Datum[]` along with an empty `key`. In
+   * this case, whenever a `children` item is assigned a new `Datum` object, the
    * corresponding element will be recreated, though the index is not changed,
    * which causes d3 calling `onupdate` other than `onenter` at `join` phase.
    * _`children` will not be inherited._
@@ -372,7 +372,7 @@ interface DatumProxy
   attr(...v: AttrParameters<D3Selection>): DatumProxy;
   style(...v: StyleParameters<D3Selection>): DatumProxy;
   on(...v: EventParameters<D3Selection>): DatumProxy;
-  transition(t: string | D3Transition): TransitionProxy;
+  transition(t?: string | D3Transition): TransitionProxy;
 }
 
 export interface DataProxy extends Array<DatumProxy> {
