@@ -19,8 +19,15 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "lib/**/*.js",
-    "lib/**/*.ts"
+    "lib/custom_element.js",
+    "lib/custom_element.d.ts",
+    "lib/mixin_d3.js",
+    "lib/mixin_d3.d.ts",
+    "lib/overloaded.d.ts",
+    "lib/responsive-svg.js",
+    "lib/responsive-svg.d.ts",
+    "lib/shadow_element.js",
+    "lib/shadow_element.d.ts"
   ],
   "module": "index.js",
   "main": "index.js",
