@@ -1,6 +1,6 @@
 {
   "name": "mixin_d3",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Mixin D3 with JSON-style Web Components coding",
   "homepage": "https://github.com/vegertar/mixin_d3",
   "license": "MIT",
@@ -30,10 +30,14 @@
     "lib/shadow_element.d.ts"
   ],
   "module": "index.js",
-  "main": "index.js",
+  "main": "mixin_d3.js",
+  "browser": "mixin_d3.min.js",
+  "jsdelivr": "mixin_d3.min.js",
+  "unpkg": "mixin_d3.min.js",
   "types": "index.d.ts",
   "type": "module",
   "scripts": {
+    "build": "rollup -c ",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "tw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "doc": "typedoc"
@@ -45,6 +49,8 @@
     "express": "^4.17.3",
     "jest": "^27.5.1",
     "muuri": "^0.9.5",
+    "rollup": "^2.75.6",
+    "rollup-plugin-terser": "^7.0.2",
     "tweakpane": "^3.0.8",
     "typedoc": "^0.22.17",
     "typedoc-plugin-missing-exports": "^0.22.6",

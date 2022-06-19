@@ -4,6 +4,7 @@
   "excludeExternals": true,
   "media": "media",
   "out": "docs",
+  "customCss": "theme/style.css",
   "replaceText": {
     "inCodeCommentText": false,
     "inCodeCommentTags": false,
@@ -16,6 +17,10 @@
       {
         "pattern": "/__tests__/lib/",
         "replace": "https://github.com/vegertar/mixin_d3/blob/main/__tests__/lib/"
+      },
+      {
+        "pattern": "\\[\\!\\[GH].*\\(https://vegertar.github.io/mixin_d3/\\)",
+        "replace": "[![GH](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vegertar/mixin_d3)"
       }
     ]
   }

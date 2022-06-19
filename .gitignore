@@ -1,4 +1,6 @@
 __tests__/**/*.output.html
-html-report/
-node_modules/*
+/html-report
+/node_modules
 /sync.sh
+/mixin_d3.js
+/mixin_d3.min.js
