@@ -11,6 +11,7 @@ beforeEach(() => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="/node_modules/d3/dist/d3.js"></script>
     <script src="/node_modules/tweakpane/dist/tweakpane.js"></script>
+    <script src="/node_modules/jest-expect-standalone/dist/expect.min.js"></script>
     <style>
       html {
         height: 100%;

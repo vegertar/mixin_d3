@@ -1,6 +1,6 @@
 {
   "name": "mixin_d3",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Mixin D3 with JSON-style Web Components coding",
   "homepage": "https://github.com/vegertar/mixin_d3",
   "license": "MIT",
@@ -48,6 +48,7 @@
     "d3": "^7.4.4",
     "express": "^4.17.3",
     "jest": "^27.5.1",
+    "jest-expect-standalone": "^24.0.2",
     "muuri": "^0.9.5",
     "rollup": "^2.75.6",
     "rollup-plugin-terser": "^7.0.2",

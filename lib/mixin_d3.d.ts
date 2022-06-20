@@ -6,6 +6,7 @@ type D3Selection = d3.Selection<d3.BaseType, Datum, d3.BaseType, Datum>;
 type D3Transition = d3.Transition<d3.BaseType, Datum, d3.BaseType, Datum>;
 type D3Type = D3Selection | D3Transition;
 type D3ValueFn = d3.ValueFn<d3.BaseType, Datum, d3.KeyType>;
+type SelectAllParameters = OverloadedParameters<D3Selection["selectAll"]>;
 type JoinParameters = OverloadedParameters<D3Selection["join"]>;
 type EachParameters = OverloadedParameters<D3Selection["each"]>;
 type CallParameters = OverloadedParameters<D3Selection["call"]>;
@@ -15,7 +16,7 @@ type StyleParameters<T extends D3Type> = OverloadedParameters<T["style"]>;
 type EventParameters<T extends D3Type> = OverloadedParameters<T["on"]>;
 type PropertyParameters = OverloadedParameters<D3Selection["property"]>;
 type TweenParameters = OverloadedParameters<D3Transition["tween"]>;
-type Constructor = new (...args: any[]) => CustomElement;
+type CustomElementConstructor = new (...args: any[]) => CustomElement;
 
 type Collection<
   T extends
@@ -68,49 +69,63 @@ type Transitions =
 export interface Datum {
   /**
    *  `tag` is the node name passing to `d3.create` to create a new node.
-   * Ordinarily, if `ns` is not empty and `tag` doesn't contain the optional
-   * ns prefix, both `tag` and `ns` fields are getting involved to create the
-   * new node. _`tag` will not be inherited._
+   * Ordinarily, if `ns` in parent is not empty and `tag` doesn't contain the
+   * optional `ns` prefix, both `tag` and parent `ns` fields are getting
+   * involved to create the new node. _`tag` will not be inherited._
    *
    * E.g.
    * ```js
+   * // create <g> without namespace
    *   {tag: "g"} => d3.create("g")
-   *   {tag: "g", ns: "svg"} => d3.create("svg:g")
+   * // create <g> without namespace as this 'ns' affects descendants only
+   *   {tag: "g", ns: "svg"} => d3.create("g")
+   * // create <g> within svg namespace
+   *   {ns: "svg", children: {tag: "g"}} => d3.create("svg:g")
+   * // create <a> within xhtml namespace
    *   {tag: "xhtml:a"} => d3.create("xhtml:a")
+   * // create <a> within xhtml namespace along with specifying descendant `ns`
    *   {tag: "xhtml:a", ns: "svg"} => d3.create("xhtml:a")
    * ```
    */
   tag: string;
 
   /**
-   * `ns` specifies the namespace to help create the node.
+   * `ns` specifies the namespace to help create the children nodes.
    * _`ns` will be inherited by children if one not provided._
    */
-  ns?: string | null;
+  ns?: "svg" | "xhtml" | "xlink" | "xml" | "xmlns" | null;
 
   /**
    * `selector` is the parameter passing to `d3.Selection.selectAll` to create
    * a selection of children.
    * _`selector` will be inherited by children if one not provided._
    */
-  selector?: string | null;
+  selector?: SelectAllParameters[0];
 
   /**
    * `children` is the first parameter passing to `d3.Selection.data` to bind
    * datum. To remove all children one should assign `children` an empty array,
    * or just set `children.length` to zero, `undefined` or `null` one will not
-   * be touched. Pay attention that `children` behaves completely different from
+   * be touched.
+   *
+   * Pay attention that `children` behaves completely different from
    * `d3.Selection.data` when type is `Datum[]` along with an empty `key`. In
    * this case, whenever a `children` item is assigned a new `Datum` object, the
    * corresponding element will be recreated, though the index is not changed,
    * which causes d3 calling `onupdate` other than `onenter` at `join` phase.
+   *
+   * On the other hand, if `children` is a literal array, or more accurately,
+   * the first element is literal, then mixin_d3 is working totally as d3 does,
+   * but a literal node will be created since no `tag` provided, for "svg" `ns`,
+   * it's &lt;text&gt;, otherwise calls `document.createTextNode`.
+   *
    * _`children` will not be inherited._
    *
    * E.g.
    * ```js
    * // init:
    *    this.data = [{tag: "div" }]
-   * //   this.data.children is null
+   * //   this.data[0].children is empty
    *
    * // the first set:
    *    this.data[0].children = [{tag: "p"}]
@@ -387,33 +402,76 @@ export interface DataProxy extends Array<DatumProxy> {
  */
 export function create(d: Datum, ns?: Datum["ns"]): D3Selection;
 
+/**
+ * `Mixin` declares properties/methods that mixin_d3 salting into a subclass of
+ * [[CustomElement]].
+ */
 type Mixin = {
+  /**
+   * `root` is the root selection that mixin_d3 working at. Default `root`
+   * refers to custom element itself or `shadowRoot` if has attached to the
+   * `ShadowDOM`.
+   */
   root: D3Selection;
+  /**
+   * `selector` defines the way to select all descendants to work with. By
+   * default all child nodes are used.
+   */
+  selector: Datum["selector"];
+  /**
+   * Defaults `null`.
+   */
   children: Datum["children"];
+  /**
+   * Defaults `null`.
+   */
   ns: Datum["ns"];
+  /**
+   * Defaults `null`.
+   */
   key: Datum["key"];
+  /**
+   * Defaults `null`.
+   */
   join: Datum["join"];
+  /**
+   * Default `null`.
+   */
   each: Datum["each"];
+  /**
+   * Defaults `null`.
+   */
   call: Datum["call"];
 
   /**
-   * `update` calls `this.root.selectAll` to apply changelogs and dispatches
-   * an "update" event.
+   * `update` calls `this.root.selectAll(this.root)` to apply changelogs and
+   * dispatches an "update" event.
    */
   update(): void;
 
+  /**
+   * The majority way to update UI is by using `.data`, though this is a getter
+   * which actually is a proxy of underlying setters, further see [[DatumProxy]].
+   */
   // @ts-ignore: error TS2380
   get data(): DataProxy;
+  /**
+   * The `data` setter is used for resetting all children, against getter which
+   * usually affects part of them.
+   */
   set data(children: Datum["children"]);
 };
 
+/**
+ * The is a simple type alias to create [[Mixin]].
+ */
 type MixinClass = { new (...args: any[]): Mixin };
 
 /**
  * `mixinD3` mixin D3 with a subclass of [[CustomElement]] to approach a way of
  * JSON-style coding.
  */
-export function mixinD3<T extends Constructor>(
+export function mixinD3<T extends CustomElementConstructor>(
   Base: T,
   D3?: typeof d3
 ): MixinClass & T;

@@ -1,5 +1,5 @@
 test("responsive svg", async () => {
-  await useHtml();
+  await useHtml({ flex: 1, width: "unset", height: "unset" });
   await useScript(async () => {
     await import("/lib/responsive-svg.js");
     document.body.innerHTML = `

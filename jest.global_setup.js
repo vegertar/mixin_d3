@@ -71,7 +71,7 @@ class Server {
     });
 
     app.post("/use", (req, res) => {
-      const { id, type } = req.query;
+      const { id, type, ...options } = req.query;
       if (!id || !type) {
         return res.status(500).json(new Error("Missing parameter id/type"));
       }
@@ -84,7 +84,7 @@ class Server {
           res.status(200).json(result);
         }
       });
-      this.send(type, id, req.body).catch((error) => {
+      this.send(type, id, req.body, JSON.stringify(options)).catch((error) => {
         this.removeCallback(id);
         res.status(500).json(error);
       });
@@ -137,7 +137,7 @@ class Server {
 
   listen(port) {
     this.hs = this.app.listen(port, () => {
-      // the parent process depends below stdout to determine if the server is runing or not
+      // the parent process depends below stdout to determine if the server is running or not
       console.log("Listening at", this.address);
     });
 

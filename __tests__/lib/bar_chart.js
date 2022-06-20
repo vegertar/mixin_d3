@@ -7,7 +7,7 @@ test("A very simple bar-chart", async () => {
     E: 125,
   };
 
-  await useHtml();
+  await useHtml({ flex: 1, width: "unset", height: "unset" });
   await useScript(async () => {
     const { MixinD3 } = await import("/lib/mixin_d3.js");
     window.customElements.define("bar-chart", MixinD3);

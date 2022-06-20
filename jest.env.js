@@ -26,11 +26,8 @@ export default class extends JestEnv {
     return this.global.document.documentElement.outerHTML;
   }
 
-  async useHtml(doc) {
-    return this.useText(
-      doc?.documentElement.outerHTML || this.currentHtml,
-      "html"
-    );
+  async useHtml(style) {
+    return this.useText(this.currentHtml, "html", style);
   }
 
   async useStyle(css) {
@@ -53,19 +50,25 @@ export default class extends JestEnv {
     return this.useText(JSON.stringify([func.toString(), ...params]), "script");
   }
 
-  async useText(text, type, id = this.currentTestName) {
+  async useText(text, type, options) {
+    const id = this.currentTestName;
     this.used.add(id);
 
     try {
-      const response = await axios.post(
-        `${this.server_url}/use?id=${encodeURI(id)}&type=${type}`,
-        Buffer.from(text),
-        {
-          headers: {
-            "Content-Type": "text/plain",
-          },
+      const url = new URL(`${this.server_url}/use`);
+      const q = url.searchParams;
+      q.set("id", id);
+      q.set("type", type);
+      if (options) {
+        for (const k in options) {
+          q.set(k, options[k]);
         }
-      );
+      }
+      const response = await axios.post(url.href, Buffer.from(text), {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response.data;

@@ -9,6 +9,8 @@ window.toJSON = toJSON;
 const magic = "urltract";
 const grid = new Muuri("body", {
   items: ".container",
+  dragEnabled: true,
+  dragHandle: "*:first-child",
 });
 
 var ws;
@@ -48,15 +50,19 @@ function className(id) {
   return `_${id.hashCode()}`;
 }
 
-function handleHtml(id, html) {
+function handleHtml(id, html, style) {
+  style = style ? JSON.parse(style) : {};
+
   let loaded = true;
   let iframe = document.querySelector(`.${className(id)}`);
   if (!iframe) {
     loaded = false;
     iframe = document.createElement("iframe");
     iframe.className = className(id);
+    iframe.setAttribute("title", id);
   }
 
+  Object.assign(iframe.style, style);
   iframe.setAttribute("srcdoc", html);
 
   if (!loaded) {
