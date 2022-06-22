@@ -4,3 +4,4 @@ __tests__/**/*.output.html
 /sync.sh
 /mixin_d3.js
 /mixin_d3.min.js
+*.log

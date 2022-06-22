@@ -52,7 +52,7 @@ test("A very simple bar-chart", async () => {
                 ["class", "y-axis"],
                 ["transform", `translate(${marginLeft},0)`],
               ],
-              __call__: d3.axisLeft(yScale),
+              $call: d3.axisLeft(yScale),
             },
             {
               tag: "g",
@@ -74,7 +74,7 @@ test("A very simple bar-chart", async () => {
                 ["class", "x-axis"],
                 ["transform", `translate(0,${height - marginBottom})`],
               ],
-              __call__: d3.axisBottom(xScale),
+              $call: d3.axisBottom(xScale),
             },
           ],
         },

@@ -1,6 +1,6 @@
 {
   "name": "mixin_d3",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "description": "Mixin D3 with JSON-style Web Components coding",
   "homepage": "https://github.com/vegertar/mixin_d3",
   "license": "MIT",
@@ -40,7 +40,8 @@
     "build": "rollup -c ",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "tw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "prepublish": "yarn build"
   },
   "devDependencies": {
     "@types/d3": "^7.4.0",

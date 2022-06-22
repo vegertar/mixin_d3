@@ -67,27 +67,34 @@ type Transitions =
     ];
 
 export interface Datum {
+  [key: string]: any;
+
   /**
    *  `tag` is the node name passing to `d3.create` to create a new node.
    * Ordinarily, if `ns` in parent is not empty and `tag` doesn't contain the
    * optional `ns` prefix, both `tag` and parent `ns` fields are getting
-   * involved to create the new node. _`tag` will not be inherited._
+   * involved to create the new node. If `tag` is empty then `.text` field is
+   * used to create a literal node. _`tag` will not be inherited._
    *
    * E.g.
    * ```js
    * // create <g> without namespace
-   *   {tag: "g"} => d3.create("g")
+   *   {tag: "g"} => d3.create("g").node()
    * // create <g> without namespace as this 'ns' affects descendants only
-   *   {tag: "g", ns: "svg"} => d3.create("g")
+   *   {tag: "g", ns: "svg"} => d3.create("g").node()
    * // create <g> within svg namespace
-   *   {ns: "svg", children: {tag: "g"}} => d3.create("svg:g")
+   *   {ns: "svg", children: [{tag: "g"}]} => d3.create("svg:g").node()
    * // create <a> within xhtml namespace
-   *   {tag: "xhtml:a"} => d3.create("xhtml:a")
+   *   {tag: "xhtml:a"} => d3.create("xhtml:a").node()
    * // create <a> within xhtml namespace along with specifying descendant `ns`
    *   {tag: "xhtml:a", ns: "svg"} => d3.create("xhtml:a")
+   * // create a TextNode
+   *   { text: "hello" }
+   * // create a <text> in SVG namespace
+   *   { ns: "svg", children: [{text: "hi}] }
    * ```
    */
-  tag: string;
+  tag?: string;
 
   /**
    * `ns` specifies the namespace to help create the children nodes.
@@ -167,30 +174,30 @@ export interface Datum {
   call?: CallParameters | CallParameters[0] | null;
 
   /**
-   * `__enter__` is the `onenter` hook to create a new node. Unlike `join`
-   * works on children nodes, `__enter__` is applied on the datum's own.
-   * _`__enter__` will not be inherited._
+   * `$enter` is the `onenter` hook to create a new node. Unlike `join`
+   * works on children nodes, `$enter` is applied on the datum's own.
+   * _`$enter` will not be inherited._
    */
-  __enter__?: (selection: D3Selection) => void;
+  $enter?: (selection: D3Selection) => void;
 
   /**
-   * `__update__` is the `onupdate` hook to update an old node. Unlike `join`
-   * works on children nodes, `__update__` is applied on the datum's own.
-   * _`__update__` will not be inherited._
+   * `$update` is the `onupdate` hook to update an old node. Unlike `join`
+   * works on children nodes, `$update` is applied on the datum's own.
+   * _`$update` will not be inherited._
    */
-  __update__?: (selection: D3Selection) => void;
+  $update?: (selection: D3Selection) => void;
 
   /**
-   * `__each__` is applied on datum's own node unlike `each` which works on
-   * children nodes. _`__each__` will not be inherited._
+   * `$each` is applied on datum's own node unlike `each` which works on
+   * children nodes. _`$each` will not be inherited._
    */
-  __each__?: EachParameters[0] | null;
+  $each?: EachParameters[0] | null;
 
   /**
-   * `__call__` is applied on datum's own node unlike `call` which works on
-   * children nodes. _`__call__` will not be inherited._
+   * `$call` is applied on datum's own node unlike `call` which works on
+   * children nodes. _`$call` will not be inherited._
    */
-  __call__?: CallParameters | CallParameters[0] | null;
+  $call?: CallParameters | CallParameters[0] | null;
 
   /**
    * `text` is the parameter passing to `d3.Selection.text`. _`text` will
@@ -408,6 +415,11 @@ export function create(d: Datum, ns?: Datum["ns"]): D3Selection;
  */
 type Mixin = {
   /**
+   * `sync` indicates that if `dispatch` runs `update` in sync mode. Defaults
+   * `false`.
+   */
+  sync: boolean;
+  /**
    * `root` is the root selection that mixin_d3 working at. Default `root`
    * refers to custom element itself or `shadowRoot` if has attached to the
    * `ShadowDOM`.
@@ -444,10 +456,22 @@ type Mixin = {
   call: Datum["call"];
 
   /**
-   * `update` calls `this.root.selectAll(this.root)` to apply changelogs and
-   * dispatches an "update" event.
+   * `dispatch` will be called whenever there is a change in `.data`. This is a
+   * wrapper function just call either `.update` or `.updateAsync` by property
+   * `.sync`.
+   */
+  dispatch(): void;
+
+  /**
+   * `update` calls `this.root.selectAll(this.root)` to apply changelogs.
    */
   update(): void;
+
+  /**
+   * `updateAsync` requests `.update` in `this.raf` to run updating before next
+   * paint.
+   */
+  updateAsync(): void;
 
   /**
    * The majority way to update UI is by using `.data`, though this is a getter

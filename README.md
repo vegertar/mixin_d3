@@ -56,6 +56,13 @@ It seems yet another JSON-style coding library? 😒, um...Yes, a sort of. If yo
 
 > NOTE: _Following contents are modified from [reactjs](https://github.com/reactjs/reactjs.org) along with [CC-BY-4.0 license](https://github.com/reactjs/reactjs.org/blob/main/LICENSE-DOCS.md)._
 
+- [Mixin D3](#mixin-d3)
+  - [Hello World](#hello-world)
+  - [Rendering Children](#rendering-children)
+    - [Rendering children into the DOM](#rendering-children-into-the-dom)
+    - [Updating the Rendered Element](#updating-the-rendered-element)
+    - [Only Updates What’s Necessary?](#only-updates-whats-necessary)
+
 ## Hello World
 
 The smallest mixin_d3 example looks like this:
@@ -144,7 +151,7 @@ class MyApp extends MixinD3 {
 
 It sets `this.data[1].text` every second from a [`setInterval()`](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval) callback.
 
-## Only Updates What’s Necessary?
+### Only Updates What’s Necessary?
 
 Short answer is can. Unlike react acts as a black box for DOM comparison, mixin_d3 derives d3 which maps data to node explicitly by either `index` or `key` to determine if to create/update/destroy a node. In last example we use the `key` function `(d) => d` to let d3 identify &lt;h2&gt;'s children by data itself, i.e. `"It is " `, `` `${new Date().toLocaleTimeString()}` `` and `"."`.
 
@@ -152,7 +159,7 @@ You can verify by inspecting the [last example](https://codepen.io/vegertar/pen/
 
 ![Only Updates What’s Necessary](media/Only-Updates-Whats-Necessary.gif)
 
-Even though we reset the children array describing the whole UI tree on every tick, only the text node whose contents have changed gets updated by the way [how d3 works with a `key`](https://bost.ocks.org/mike/selection/#key). If you remove it, you will see nothing changed after the first rendering for such children.
+Even though we reset the children array describing the whole UI tree on every tick, only the text node whose contents have changed gets updated by the way [how d3-selection works with a `key`](https://bost.ocks.org/mike/selection/#key). If you remove it, you will see nothing changed after the first rendering for such children.
 
 </details>
 

@@ -297,7 +297,7 @@ async function finalResult() {
           children: [
             {
               tag: "div",
-              __each__() {
+              $each() {
                 const squares = state.current.squares;
                 const winner = calculateWinner(squares);
                 this.textContent = winner
