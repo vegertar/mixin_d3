@@ -35,17 +35,13 @@ test("A very simple bar-chart", async () => {
     const barChart = document.querySelector("bar-chart");
     barChart.data[0] = {
       tag: "responsive-svg",
-      attrs: [
-        ["class", "component"],
-        ["viewBox", `0,0,${width},${height}`],
-      ],
+      attrs: [["viewBox", `0,0,${width},${height}`]],
       ns: "svg",
-      selector: ":scope>*",
-      children: [
+      data: [
         {
           tag: "svg",
           attrs: [["viewBox", `0,0,${width},${height}`]],
-          children: [
+          data: [
             {
               tag: "g",
               attrs: [
@@ -57,7 +53,7 @@ test("A very simple bar-chart", async () => {
             {
               tag: "g",
               attrs: [["fill", "steelblue"]],
-              children: Object.entries(phases).map((d) => ({
+              data: Object.entries(phases).map((d) => ({
                 tag: "rect",
                 attrs: {
                   x: xScale(d[0]),
@@ -65,7 +61,7 @@ test("A very simple bar-chart", async () => {
                   width: xScale.bandwidth(),
                   height: yScale(0) - yScale(d[1]),
                 },
-                children: [{ tag: "title", text: d[1] }],
+                data: [{ tag: "title", text: d[1] }],
               })),
             },
             {

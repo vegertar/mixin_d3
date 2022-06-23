@@ -83,7 +83,7 @@ export interface Datum {
    * // create <g> without namespace as this 'ns' affects descendants only
    *   {tag: "g", ns: "svg"} => d3.create("g").node()
    * // create <g> within svg namespace
-   *   {ns: "svg", children: [{tag: "g"}]} => d3.create("svg:g").node()
+   *   {ns: "svg", data: [{tag: "g"}]} => d3.create("svg:g").node()
    * // create <a> within xhtml namespace
    *   {tag: "xhtml:a"} => d3.create("xhtml:a").node()
    * // create <a> within xhtml namespace along with specifying descendant `ns`
@@ -91,7 +91,7 @@ export interface Datum {
    * // create a TextNode
    *   { text: "hello" }
    * // create a <text> in SVG namespace
-   *   { ns: "svg", children: [{text: "hi}] }
+   *   { ns: "svg", data: [{text: "hi}] }
    * ```
    */
   tag?: string;
@@ -110,43 +110,43 @@ export interface Datum {
   selector?: SelectAllParameters[0];
 
   /**
-   * `children` is the first parameter passing to `d3.Selection.data` to bind
-   * datum. To remove all children one should assign `children` an empty array,
-   * or just set `children.length` to zero, `undefined` or `null` one will not
+   * `data` is the first parameter passing to `d3.Selection.data` to bind
+   * datum. To remove all children one should assign `data` an empty array,
+   * or just set `data.length` to zero, `undefined` or `null` one will not
    * be touched.
    *
-   * Pay attention that `children` behaves completely different from
+   * Pay attention that `data` behaves completely different from
    * `d3.Selection.data` when type is `Datum[]` along with an empty `key`. In
-   * this case, whenever a `children` item is assigned a new `Datum` object, the
+   * this case, whenever a `data` item is assigned a new `Datum` object, the
    * corresponding element will be recreated, though the index is not changed,
    * which causes d3 calling `onupdate` other than `onenter` at `join` phase.
    *
-   * On the other hand, if `children` is a literal array, or more accurately,
+   * On the other hand, if `data` is a literal array, or more accurately,
    * the first element is literal, then mixin_d3 is working totally as d3 does,
    * but a literal node will be created since no `tag` provided, for "svg" `ns`,
    * it's &lt;text&gt;, otherwise calls `document.createTextNode`.
    *
-   * _`children` will not be inherited._
+   * _`data` will not be inherited._
    *
    * E.g.
    * ```js
    * // init:
    *    this.data = [{tag: "div" }]
-   * //   this.data[0].children is empty
+   * //   the children of <div> is empty
    *
    * // the first set:
-   *    this.data[0].children = [{tag: "p"}]
-   * //   the length of children changed, causes d3.Selection.enter()
+   *    this.data[0].data = [{tag: "p"}]
+   * //   the length of children has changed, causes d3.Selection.enter()
    * //   mixin_d3 attaches <p> with the initial datum {tag: "p"}
    *
    * // reset one child:
-   *    this.data[0].children[0] = {tag: "span"}
+   *    this.data[0].data[0] = {tag: "span"}
    * //   the length of children remains, causes d3.Selection.update()
    * //   mixin_d3 detects that the datum is changed
    * //   destroys <p> and creates <span>
    * //   attaches <span> with the initial datum {tag: "span"}
    */
-  children?: [string | number | boolean | undefined, ...any[]] | Datum[] | null;
+  data?: [string | number | boolean | undefined, ...any[]] | Datum[] | null;
 
   /**
    * `key` is the second parameter passing to `d3.Selection.data`.
@@ -363,12 +363,19 @@ type TransitionProxy = {
  * interface, all methods declared in here are proxies of setters, indeed,
  * `.text()` will be executed as `.text = undefined`.
  */
-interface DatumProxy
-  extends Omit<Datum, "text" | "join" | "each" | "call" | "children"> {
+interface DatumProxy extends Omit<Datum, "text" | "join" | "each" | "call"> {
   /**
-   * `updateChildren` manually update children, if, say, one changed the `key`.
+   * `touch` manually update children, if, say, one changed the `key`.
    */
-  updateChildren(): void;
+  touch(): void;
+  /**
+   * `$` helps calling method of this node by `name`. For example, if one wanna
+   * set an attribute for this node, one way is using this function, call
+   * `.$("setAttribute", "foo", "bar")`. Although the node has not been created,
+   * by given the `name` and `args`, one can apply arbitrary methods in advance.
+   * As same as others, `$` should be considered a setter.
+   */
+  $(name: string, ...args: any[]): DatumProxy;
 
   // @ts-ignore: error TS2380
   get text(): (...v: TextParameters) => DatumProxy;
@@ -386,10 +393,6 @@ interface DatumProxy
   get call(): (...v: CallParameters) => DatumProxy;
   set call(v: Datum["call"]);
 
-  // @ts-ignore: error TS2380
-  get children(): DataProxy;
-  set children(children: Datum["children"]);
-
   property(...v: PropertyParameters): DatumProxy;
   attr(...v: AttrParameters<D3Selection>): DatumProxy;
   style(...v: StyleParameters<D3Selection>): DatumProxy;
@@ -398,8 +401,23 @@ interface DatumProxy
 }
 
 export interface DataProxy extends Array<DatumProxy> {
-  updateChildren(): void;
+  /**
+   * See {@link DatumProxy.touch}.
+   */
+  touch(): void;
 }
+
+/**
+ * `excludeChildNodes` creates a selector function to filter out all excluded
+ * names in `this.childNodes`.
+ */
+export function excludeChildNodes(...excludes: string[]): Datum["selector"];
+
+/**
+ * `includeChildNodes` creates a selector function to filter the included names
+ * in `this.childNodes`.
+ */
+export function includeChildNodes(...includes: string[]): Datum["selector"];
 
 /**
  * `create` creates a d3 selection. Unlike `d3.Selection.__data__` which is
@@ -413,7 +431,7 @@ export function create(d: Datum, ns?: Datum["ns"]): D3Selection;
  * `Mixin` declares properties/methods that mixin_d3 salting into a subclass of
  * [[CustomElement]].
  */
-type Mixin = {
+interface Mixin {
   /**
    * `sync` indicates that if `dispatch` runs `update` in sync mode. Defaults
    * `false`.
@@ -427,31 +445,28 @@ type Mixin = {
   root: D3Selection;
   /**
    * `selector` defines the way to select all descendants to work with. By
-   * default all child nodes are used.
+   * default all child nodes except `link/style/script/foreignObject/slot` are
+   * used.
    */
   selector: Datum["selector"];
   /**
-   * Defaults `null`.
-   */
-  children: Datum["children"];
-  /**
-   * Defaults `null`.
+   * Defaults `null`. See {@link Datum.ns}.
    */
   ns: Datum["ns"];
   /**
-   * Defaults `null`.
+   * Defaults `null`. See {@link Datum.key}.
    */
   key: Datum["key"];
   /**
-   * Defaults `null`.
+   * Defaults `null`. See {@link Datum.join}.
    */
   join: Datum["join"];
   /**
-   * Default `null`.
+   * Default `null`. See {@link Datum.each}.
    */
   each: Datum["each"];
   /**
-   * Defaults `null`.
+   * Defaults `null`. See {@link Datum.call}.
    */
   call: Datum["call"];
 
@@ -476,15 +491,19 @@ type Mixin = {
   /**
    * The majority way to update UI is by using `.data`, though this is a getter
    * which actually is a proxy of underlying setters, further see [[DatumProxy]].
+   * Pay attention that this getter is only defined after the node mounted.
    */
   // @ts-ignore: error TS2380
   get data(): DataProxy;
   /**
    * The `data` setter is used for resetting all children, against getter which
-   * usually affects part of them.
+   * usually affects part of them. Pay attention that this setter is only defined
+   * after the node mounted. If `this.data` has already been defined, which is
+   * the default behavior along with default value of `[]`, the old `this.data`
+   * will be used to initialize [[DataProxy]].
    */
-  set data(children: Datum["children"]);
-};
+  set data(children: Datum["data"]);
+}
 
 /**
  * The is a simple type alias to create [[Mixin]].

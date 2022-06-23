@@ -60,7 +60,7 @@ describe("mixin_d3:", () => {
           }
 
           _refresh() {
-            this.data[1].children = [
+            this.data[1].data = [
               "It is ",
               new Date().toLocaleTimeString(),
               ".",
@@ -138,14 +138,14 @@ describe("mixin_d3:", () => {
               const that = this;
               this.data[0] = {
                 tag: "fieldset",
-                children: [
+                data: [
                   { tag: "legend", text: "Enter temperature in Celsius:" },
                   {
                     tag: "input",
                     events: {
                       input: (event) => {
                         that.#temperature = event.target.value;
-                        that.data[0].updateChildren();
+                        that.data[0].touch();
                       },
                     },
                   },
@@ -188,7 +188,7 @@ describe("mixin_d3:", () => {
 
               if (name === "scale") {
                 this.#scale = newValue;
-                this.data[0]?.updateChildren();
+                this.data[0]?.touch();
               }
             }
 
@@ -197,7 +197,7 @@ describe("mixin_d3:", () => {
               const that = this;
               this.data[0] = {
                 tag: "fieldset",
-                children: [
+                data: [
                   {
                     tag: "legend",
                     $each: function () {
@@ -258,7 +258,7 @@ describe("mixin_d3:", () => {
               const that = this;
               this.data[0] = {
                 tag: "fieldset",
-                children: [
+                data: [
                   {
                     tag: "legend",
                     $each: function () {
@@ -274,7 +274,7 @@ describe("mixin_d3:", () => {
                   },
                 ],
               };
-              this.updater = this.data[0].updateChildren;
+              this.updater = this.data[0].touch;
             }
           }
         );
@@ -288,7 +288,7 @@ describe("mixin_d3:", () => {
             set #celsius(temperature) {
               this.#scale = "c";
               this.#temperature = temperature;
-              this.data.updateChildren();
+              this.data.touch();
             }
 
             get #celsius() {
@@ -300,7 +300,7 @@ describe("mixin_d3:", () => {
             set #fahrenheit(temperature) {
               this.#scale = "f";
               this.#temperature = temperature;
-              this.data.updateChildren();
+              this.data.touch();
             }
 
             get #fahrenheit() {
@@ -367,7 +367,6 @@ describe("mixin_d3:", () => {
         class extends mixinD3(ResponsiveSvg, d3) {
           ns = "svg";
           root = this.root.select("svg");
-          selector = ".component";
         }
       );
 
@@ -377,7 +376,6 @@ describe("mixin_d3:", () => {
         {
           tag: "circle",
           attrs: {
-            class: "component",
             fill: "steelblue",
             r: 20,
             cx: 40,

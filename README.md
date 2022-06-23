@@ -17,7 +17,6 @@ myApp.data = [
   {
     tag: "circle",
     attrs: {
-      class: "component",
       fill: "steelblue",
       r: 20,
       cx: 40,
@@ -141,7 +140,7 @@ class MyApp extends MixinD3 {
     ];
 
     setInterval(() => {
-      this.data[1].children = ["It is ", new Date().toLocaleTimeString(), "."];
+      this.data[1].data = ["It is ", new Date().toLocaleTimeString(), "."];
     }, 1000);
   }
 }

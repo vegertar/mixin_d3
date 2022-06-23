@@ -73,9 +73,13 @@ function handleHtml(id, html, style) {
     const container = document.createElement("div");
     container.className = "container";
 
+    const bar = document.createElement("div");
+    bar.classList.add("bar");
+
     const h3 = document.createElement("h3");
     h3.textContent = id;
 
+    container.appendChild(bar);
     container.appendChild(h3);
     container.appendChild(iframe);
     grid.add(container);

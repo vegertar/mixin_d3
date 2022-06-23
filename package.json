@@ -1,6 +1,6 @@
 {
   "name": "mixin_d3",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Mixin D3 with JSON-style Web Components coding",
   "homepage": "https://github.com/vegertar/mixin_d3",
   "license": "MIT",

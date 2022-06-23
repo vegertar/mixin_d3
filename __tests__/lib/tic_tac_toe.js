@@ -14,9 +14,8 @@ async function passingDataThroughProps() {
   myGame.data = [
     {
       tag: "div",
-      attrs: [["class", "game component"]],
-      selector: ":scope>*",
-      children: [
+      attrs: [["class", "game"]],
+      data: [
         {
           tag: "style",
           text: `
@@ -75,7 +74,7 @@ async function passingDataThroughProps() {
         {
           tag: "div",
           attrs: [["class", "game-board"]],
-          children: [
+          data: [
             {
               tag: "div",
               attrs: [["class", "status"]],
@@ -84,7 +83,7 @@ async function passingDataThroughProps() {
             ...d3.range(3).map((row) => ({
               tag: "div",
               attrs: [["class", "board-row"]],
-              children: d3.range(3).map((col) => ({
+              data: d3.range(3).map((col) => ({
                 tag: "button",
                 attrs: [["class", "square"]],
                 text: 3 * row + col,
@@ -95,7 +94,7 @@ async function passingDataThroughProps() {
         {
           tag: "div",
           attrs: [["class", "game-info"]],
-          children: [{ tag: "div" }, { tag: "ol" }],
+          data: [{ tag: "div" }, { tag: "ol" }],
         },
       ],
     },
@@ -175,14 +174,14 @@ async function finalResult() {
       state.update();
     },
     update() {
-      const gameInfo = myGame.data[0].children[2];
-      const gameHistory = gameInfo.children[1];
-      const j = gameHistory.children.length;
-      gameHistory.children.length = state.history.length;
+      const gameInfo = myGame.data[0].data[2];
+      const gameHistory = gameInfo.data[1];
+      const j = gameHistory.data.length;
+      gameHistory.data.length = state.history.length;
       for (let i = j; i < state.history.length; ++i) {
-        gameHistory.children[i] = {
+        gameHistory.data[i] = {
           tag: "li",
-          children: [
+          data: [
             {
               tag: "button",
               text: "Go to move #" + i,
@@ -205,9 +204,9 @@ async function finalResult() {
   myGame.data = [
     {
       tag: "div",
-      attrs: [["class", "game component"]],
+      attrs: [["class", "game"]],
       selector: ":scope>*",
-      children: [
+      data: [
         {
           tag: "style",
           text: `
@@ -266,10 +265,10 @@ async function finalResult() {
         {
           tag: "div",
           attrs: [["class", "game-board"]],
-          children: d3.range(3).map((row) => ({
+          data: d3.range(3).map((row) => ({
             tag: "div",
             attrs: [["class", "board-row"]],
-            children: d3.range(3).map((col) => ({
+            data: d3.range(3).map((col) => ({
               tag: "button",
               attrs: [["class", "square"]],
               events: {
@@ -294,7 +293,7 @@ async function finalResult() {
         {
           tag: "div",
           attrs: [["class", "game-info"]],
-          children: [
+          data: [
             {
               tag: "div",
               $each() {
@@ -307,10 +306,10 @@ async function finalResult() {
             },
             {
               tag: "ol",
-              children: [
+              data: [
                 {
                   tag: "li",
-                  children: [
+                  data: [
                     {
                       tag: "button",
                       text: "Go to game start",
@@ -327,7 +326,7 @@ async function finalResult() {
   ];
 }
 
-describe("Tic Tac Toe against React Tutorial: ", () => {
+describe("Tic Tac Toe:", () => {
   test("Passing Data Through Props", async () => {
     await useScript(passingDataThroughProps);
   });
